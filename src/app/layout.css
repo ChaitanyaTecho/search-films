@@ -1,0 +1,24 @@
+.app-container{
+    margin: 30px auto 0;
+    max-width: 800px;
+    padding: 1px 15px 40px;
+    background: #fff;
+}
+.search-container > form{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+.search-box input{
+    height: 30px;
+    padding: 5px 10px;
+    margin-right: 20px;
+    font-size: 16px;
+}
+label{
+    margin-left: 10px;
+    margin-right: 10px
+}
+input[type="radio"] {
+    margin-right: 7px;
+}
