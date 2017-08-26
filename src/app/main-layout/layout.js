@@ -1,15 +1,22 @@
 import React, { Component } from 'react';
+import Movies from '../movie-data/movie-data';
 import './layout.css';
 
 export default class Layout extends Component{
-    
+    constructor(){
+        super();
+        this.rawData = [];
+        this.tempMovieData = [];
+        this.movieData = [];
+    }
     searchMovie = e => {
-        var value = e.target.value.trim().replace(/  +/g, ' ').split(' ').join('+');
+        //e.preventDefault();
+        var value = e.target.value.replace(/  +/g, ' ').split(' ').join('+').trim();
         if(value.length === 9 && isNaN(value.substring(0,2)) && (!(isNaN(value.substring(2,7)))) ){
             this.setUrl('i', value);
         }else{
             if(value.indexOf('+') > -1){
-                this.setUrl('t', value);
+                this.setUrl('s', value);
             }else{
                 this.setUrl('i', value);
             }
@@ -19,8 +26,21 @@ export default class Layout extends Component{
         const API_DOMAIN = "http://www.omdbapi.com/?";
         const API_KEY = "&apikey=e260c91c";
         fetch(`${API_DOMAIN}${term}=${value}${API_KEY}`)
-        .then(result => console.log(result.json()))
-    } 
+        .then(result => result.json())
+        .then(json => this.rawData.push(json))
+        this.cleanData();
+    }
+    cleanData = () => {
+        this.rawData.filter(movie => {
+            if(movie.Response === 'True'){
+                this.tempMovieData.push(movie);
+                this.tempMovieData.splice(0, this.tempMovieData.length-1);
+                this.movieData = this.tempMovieData[0]['Search'];
+            }
+            return this.movieData;
+        });
+     console.log(this.movieData)   
+    }
     render(){
         return (
             <div className="app-container">
@@ -44,9 +64,7 @@ export default class Layout extends Component{
                     </form>
                 </div>
                 <div className="movie-container">
-                    <ul>
-                
-                    </ul>
+                    {this.movieData.map((m,i) => <Movies {...m} />)}
                 </div>
             </div>
         );
