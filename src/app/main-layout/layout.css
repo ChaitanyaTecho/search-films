@@ -22,3 +22,22 @@ label{
 input[type="radio"] {
     margin-right: 7px;
 }
+
+.movie-box {
+    padding: 10px;
+    margin: 10px 0px 30px;
+    border: 1px solid #ccc;
+}
+.movie-box h3{
+    margin-top: 0;
+}
+
+@media all and (max-width : 640px){
+    .search-container > form{
+        flex-flow: column;
+        align-items: flex-start;
+    }
+    .sortBox{
+        margin-top: 20px;
+    }
+}

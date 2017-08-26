@@ -46,6 +46,12 @@ export default class Layout extends Component{
                     this.movieData = this.tempMovieData;
                 }else{
                     this.movieData = this.tempMovieData[0]['Search'];
+                    this.movieData.map(i => {
+                        if(i.Year.indexOf('–') > -1){
+                            i.Year = i.Year.split('–').pop();
+                        }
+                        return true;
+                    });
                 }
             }
             return this.movieData;
@@ -60,6 +66,16 @@ export default class Layout extends Component{
             return new Date(a.Year) - new Date(b.Year);
         });
         console.log(this.movieData, 'updated');
+        this.setState({});
+    }
+
+    sortByTitle = e => {
+        this.movieData.sort(function(a, b){
+            if(a.Title < b.Title) return -1;
+            if(a.Title > b.Title) return 1;
+            return 0;
+        });
+        this.setState({});
     }
     render(){
         return (
