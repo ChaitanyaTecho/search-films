@@ -12,9 +12,11 @@ import './layout.css';
 export default class Layout extends Component{
     constructor(){
         super();
-        this.rawData = [];
-        this.tempMovieData = [];
-        this.movieData = [];       
+        this.state = {
+            rawData : [],
+            tempMovieData : [],
+            movieData : []    
+        }   
     }
 
     searchMovie = e => {
@@ -48,7 +50,7 @@ export default class Layout extends Component{
                     break;
         
                 case 'GET_MOVIES_FULFILLED':
-                    return {...state, fetching : false, fetched : true, movies : action.payload.data};
+                    return {...state, fetching : false, fetched : true, movies : action.payload};
                     break;
             }
         }
@@ -59,6 +61,17 @@ export default class Layout extends Component{
             type : 'GET_MOVIES',
             payload : axios.get(this.getMovies('s',value))
         });
+        movieStore.subscribe(() => {
+            // When state will be updated(in our case, when items will be fetched), we will update local component state and force component to rerender with new data.
+            this.setState({
+                rawData: movieStore.getState().movies.data
+            });
+            console.log('this.state.rawData',this.state.rawData)
+            /* if(this.state.rawData.Response === 'True'){
+                this.state.rawData.Search = this.state.movieData;
+            }
+            console.log('this.state.movie',this.state.movieData) */
+          });
             /* dispatch({type : 'GET_MOVIES_PENDING'});
             axios.get(this.getMovies('s',value))
                  .then(response => {
@@ -70,7 +83,7 @@ export default class Layout extends Component{
         }); */
         // this.getMovies('s',value)
         this.setState({});
-        this.cleanData();
+        // this.cleanData();
     }
 
     getMovies = (term, value) => {
@@ -86,23 +99,23 @@ export default class Layout extends Component{
     }
 
     cleanData = () => {
-        console.log("rawdata");
-        this.rawData.filter(movie => {
-            if(movie.Response === 'True'){
-                this.tempMovieData.push(movie);
+        console.log("rawdata", this.state.rawData);
+            if(this.state.rawData.Response === 'True'){
+                console.log('true inside.. data')
+                this.state.rawData.Search = this.state.movieData;
+                console.log('this.state.movieData---------------->',this.state.rawData.Search)
+                /* this.tempMovieData.push(movie);
                 this.tempMovieData.splice(0, this.tempMovieData.length-1);
-                this.movieData = this.tempMovieData[0]['Search'];
-                this.movieData.map(i => {
+                this.movieData = this.tempMovieData[0]['Search']; */
+                /* this.state.movieData.map(i => {
                     if(i.Year.indexOf('–') > -1){
                         i.Year = i.Year.split('–').pop();
                     }
                     return true;
-                }); 
+                }); */ 
             }
-            return this.movieData;
-        });
-     console.log(this.movieData);
-     //
+            return this.state.movieData;
+        
      this.setState({});
     }
 
@@ -145,7 +158,7 @@ export default class Layout extends Component{
                     </form>
                 </div>
                 <div className="movie-container">
-                    {this.movieData.map((m,i) => <MoviesLayout key={i} {...m} /> )}
+                    {this.state.movieData.map((m,i) => <MoviesLayout key={i} {...m} /> )}
                 </div>
             </div>
         );
