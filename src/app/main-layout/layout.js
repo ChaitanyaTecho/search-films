@@ -13,10 +13,10 @@ export default class Layout extends Component{
     constructor(){
         super();
         this.state = {
-            rawData : [],
-            tempMovieData : [],
-            movieData : []    
+            rawData : [],  
         }   
+        this.tempMovieData = [],
+        this.movieData = []  
     }
 
     searchMovie = e => {
@@ -64,14 +64,15 @@ export default class Layout extends Component{
         movieStore.subscribe(() => {
             // When state will be updated(in our case, when items will be fetched), we will update local component state and force component to rerender with new data.
             this.setState({
-                rawData: movieStore.getState().movies.data
+                rawData: movieStore.getState().movies.data,
             });
-            console.log('this.state.rawData',this.state.rawData)
-            /* if(this.state.rawData.Response === 'True'){
-                this.state.rawData.Search = this.state.movieData;
+            this.tempMovieData = this.state.rawData;
+            this.cleanData();
+            /* if(this.tempMovieData.Response === 'True'){
+                this.tempMovieData.Search = this.movieData;
             }
-            console.log('this.state.movie',this.state.movieData) */
-          });
+            console.log('this.state.movieeeeeeeeeeeeeeeeeeee=====>',this.movieData) */
+        });
             /* dispatch({type : 'GET_MOVIES_PENDING'});
             axios.get(this.getMovies('s',value))
                  .then(response => {
@@ -82,8 +83,7 @@ export default class Layout extends Component{
                  })
         }); */
         // this.getMovies('s',value)
-        this.setState({});
-        // this.cleanData();
+        this.setState({}); 
     }
 
     getMovies = (term, value) => {
@@ -99,22 +99,30 @@ export default class Layout extends Component{
     }
 
     cleanData = () => {
-        console.log("rawdata", this.state.rawData);
-            if(this.state.rawData.Response === 'True'){
+        if(this.tempMovieData.Response === 'True'){
+            this.movieData = this.tempMovieData.Search;
+            this.movieData.map(i => {
+                if(i.Year.indexOf('–') > -1){
+                    i.Year = i.Year.split('–')[0];
+                }
+                return true;
+            }); 
+        }
+            /* if(this.state.rawData.Response === 'True'){
                 console.log('true inside.. data')
                 this.state.rawData.Search = this.state.movieData;
                 console.log('this.state.movieData---------------->',this.state.rawData.Search)
-                /* this.tempMovieData.push(movie);
+                this.tempMovieData.push(movie);
                 this.tempMovieData.splice(0, this.tempMovieData.length-1);
-                this.movieData = this.tempMovieData[0]['Search']; */
-                /* this.state.movieData.map(i => {
+                this.movieData = this.tempMovieData[0]['Search'];
+                this.state.movieData.map(i => {
                     if(i.Year.indexOf('–') > -1){
                         i.Year = i.Year.split('–').pop();
                     }
                     return true;
-                }); */ 
+                }); 
             }
-            return this.state.movieData;
+            return this.state.movieData; */
         
      this.setState({});
     }
@@ -123,7 +131,7 @@ export default class Layout extends Component{
         this.movieData.sort ( (a, b) => {
             return new Date(a.Year) - new Date(b.Year);
         });
-        console.log(this.movieData, 'updated');
+        // console.log(this.movieData, 'updated');
         this.setState({});
     }
 
@@ -158,7 +166,7 @@ export default class Layout extends Component{
                     </form>
                 </div>
                 <div className="movie-container">
-                    {this.state.movieData.map((m,i) => <MoviesLayout key={i} {...m} /> )}
+                    {this.movieData.map((m,i) => <MoviesLayout key={i} {...m} /> )}
                 </div>
             </div>
         );
