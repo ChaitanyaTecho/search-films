@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import Movies from '../movie-data/movie-data';
+import MoviesLayout from '../movie-layout/movie-layout';
+
 import './layout.css';
 
 export default class Layout extends Component{
@@ -13,18 +14,19 @@ export default class Layout extends Component{
     searchMovie = e => {
         //e.preventDefault();
         var value = e.target.value.replace(/  +/g, ' ').split(' ').join('+').trim();
-        if(value.length === 9 && isNaN(value.substring(0,2)) && (!(isNaN(value.substring(2,7)))) ){
-            this.setUrl('i', value);
+        /* if(value.length === 9 && isNaN(value.substring(0,2)) && (!(isNaN(value.substring(2,7)))) ){
+            this.getMovies('i', value);
         }else{
             if(value.indexOf('+') > -1){
-                this.setUrl('s', value);
+                this.getMovies('s', value);
             }else{
-                this.setUrl('i', value);
+                this.getMovies('i', value);
             }
-        }
+        } */
+        this.getMovies('s',value)
     }
 
-    setUrl = (term, value) => {
+    getMovies = (term, value) => {
         const API_DOMAIN = "http://www.omdbapi.com/?";
         const API_KEY = "&apikey=e260c91c";
         fetch(`${API_DOMAIN}${term}=${value}${API_KEY}`)
@@ -100,7 +102,7 @@ export default class Layout extends Component{
                     </form>
                 </div>
                 <div className="movie-container">
-                    {this.movieData.map((m,i) => <Movies key={i} {...m} /> )}
+                    {this.movieData.map((m,i) => <MoviesLayout key={i} {...m} /> )}
                 </div>
             </div>
         );

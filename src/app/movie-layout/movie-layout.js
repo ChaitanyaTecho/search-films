@@ -1,10 +1,10 @@
 import React  from 'react';
 
-const Movies = movie =>
+const MoviesLayout = movie =>
     <div className="movie-box">
         <h3>{movie.Title}</h3>
         <img src={movie.Poster} alt=""/>
         <p>Year of Release : {movie.Year}</p>
     </div>;
 
-export default Movies;
+export default MoviesLayout;
