@@ -1,4 +1,10 @@
 import React, { Component } from 'react';
+import { applyMiddleware, createStore } from 'redux';
+import axios from 'axios';
+import {createLogger} from 'redux-logger';
+import thunk from 'redux-thunk';
+import promise from 'redux-promise-middleware';
+import { Provider } from 'react-redux';
 import MoviesLayout from '../movie-layout/movie-layout';
 
 import './layout.css';
@@ -8,7 +14,7 @@ export default class Layout extends Component{
         super();
         this.rawData = [];
         this.tempMovieData = [];
-        this.movieData = [];
+        this.movieData = [];       
     }
 
     searchMovie = e => {
@@ -23,38 +29,75 @@ export default class Layout extends Component{
                 this.getMovies('i', value);
             }
         } */
-        this.getMovies('s',value)
+
+        const initialState = {
+            fetching : false,
+            fetched : false,
+            movies : this.rawData,
+            error : null
+        };
+
+        const reducer = (state=initialState, action) => {
+            switch (action.type) {
+                case 'GET_MOVIES_PENDING':
+                    return {...state, fetching : true};
+                    break;
+        
+                case 'GET_MOVIES_REJECTED':
+                    return {...state, fetching : false, error: action.payload};
+                    break;
+        
+                case 'GET_MOVIES_FULFILLED':
+                    return {...state, fetching : false, fetched : true, movies : action.payload.data};
+                    break;
+            }
+        }
+        const middleWare = applyMiddleware(promise(), thunk, createLogger());
+        const movieStore = createStore(reducer, middleWare);
+
+        movieStore.dispatch({
+            type : 'GET_MOVIES',
+            payload : axios.get(this.getMovies('s',value))
+        });
+            /* dispatch({type : 'GET_MOVIES_PENDING'});
+            axios.get(this.getMovies('s',value))
+                 .then(response => {
+                    dispatch({type : 'GET_MOVIES_SUCCESS', payload : response.data});
+                 })
+                 .catch(err => {
+                     dispatch({type : 'GET_MOVIES_ERROR', payload : err});
+                 })
+        }); */
+        // this.getMovies('s',value)
+        this.setState({});
+        this.cleanData();
     }
 
     getMovies = (term, value) => {
         const API_DOMAIN = "http://www.omdbapi.com/?";
         const API_KEY = "&apikey=e260c91c";
-        fetch(`${API_DOMAIN}${term}=${value}${API_KEY}`)
+        return `${API_DOMAIN}${term}=${value}${API_KEY}`;
+        /* fetch(`${API_DOMAIN}${term}=${value}${API_KEY}`)
         .then(result => result.json())
         .then(json => {
             this.rawData.push(json);
             this.cleanData(term);
-        });
+        }); */
     }
 
-    cleanData = (term) => {
-        console.log(term);
+    cleanData = () => {
+        console.log("rawdata");
         this.rawData.filter(movie => {
             if(movie.Response === 'True'){
                 this.tempMovieData.push(movie);
                 this.tempMovieData.splice(0, this.tempMovieData.length-1);
-                if(term === 'i'){
-                    console.log('inside')
-                    this.movieData = this.tempMovieData;
-                }else{
-                    this.movieData = this.tempMovieData[0]['Search'];
-                    this.movieData.map(i => {
-                        if(i.Year.indexOf('–') > -1){
-                            i.Year = i.Year.split('–').pop();
-                        }
-                        return true;
-                    });
-                }
+                this.movieData = this.tempMovieData[0]['Search'];
+                this.movieData.map(i => {
+                    if(i.Year.indexOf('–') > -1){
+                        i.Year = i.Year.split('–').pop();
+                    }
+                    return true;
+                }); 
             }
             return this.movieData;
         });
